@@ -3,6 +3,8 @@ local Players = game:GetService("Players")
 local runService = game:GetService("RunService")
 local ts = game:GetService("TweenService")
 
+local tinf = TweenInfo.new(.3, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut)
+
 local p = Players.LocalPlayer
 local pGui = p:WaitForChild("PlayerGui")
 
@@ -17,24 +19,47 @@ local variables = {
 
 local function CreateButton(name, parent)
     local barFrame = Instance.new("CanvasGroup", parent)
+    barFrame.BackgroundColor3 = Color3.fromRGB(61,61,61)
     barFrame.Size = UDim2.new(0.197, 0,0.64, 0)
     barFrame.Position = UDim2.new(0.728, 0,0.162, 0)
 
     local corner = Instance.new("UICorner", barFrame)
+    corner.CornerRadius = UDim.new(1,0)
 
     local stroke = Instance.new("UIStroke", barFrame)
     stroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Contextual
     stroke.Color = Color3.fromRGB(255,255,255)
-
+    --{}[]
     local button = Instance.new("TextButton", barFrame)
     button.Name = name
-    button.TextLabel = ""
+    button.Text = ""
     button.Size = UDim2.new(0.391, 0,1, 0)
     button.Position = UDim2.new(0.609, 0,0, 0)
     button.BackgroundColor3 = Color3.fromRGB(255,0,0)
 
+    local onAnim = ts:Create(button, tinf, {
+        Position = UDim2.fromScale(button.Position.X.Scale - .6, button.Position.Y.Scale),
+        BackgroundColor3 = Color3.fromRGB(0,255,0)
+    })
+
+    local offAnim = ts:Create(button, tinf, {
+        Position = UDim2.fromScale(button.Position.X.Scale, button.Position.Y.Scale),
+        BackgroundColor3 = Color3.fromRGB(255,0,0)
+    })
+
+    button.Activated:Connect(function()
+        local status = variables[button.Name]
+        if (status == false) then
+            onAnim:Play()
+            variables[button.Name] = true
+        else
+            offAnim:Play()
+            variables[button.Name] = false
+        end
+    end)
+
     local buttonCorner = Instance.new("UICorner", button)
-    buttonCorner.CornerRadius = Udim.new(1,0)
+    buttonCorner.CornerRadius = UDim.new(1,0)
 end
 
 local function InitUI()
