@@ -6,6 +6,7 @@ local ts = game:GetService("TweenService")
 local tinf = TweenInfo.new(.3, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut)
 
 local p = Players.LocalPlayer
+local mouse = p:GetMouse()
 local pGui = p:WaitForChild("PlayerGui")
 
 --{}[]
@@ -16,6 +17,36 @@ local variables = {
     Aimbot = false,
     Spintbot = false
 }
+
+mouse.Button1Down:Connect(function()
+    if (variables.CtoTeleport == false) then return end
+    local hitPos = mouse.Hit
+    local char = p.Character
+    if (char) and (hitPos) and (char:FindFirstChild("HumanoidRootPart")) then
+        char.HumanoidRootPart.CFrame = hitPos * CFrame.new(0,5,0)
+    end
+end)
+
+local function TeleportPlayer(givenName)
+    local tPlayer = nil
+    if (Players:FindFirstChild(givenName)) and (p.Character) and (p.Character:FindFirstChild("HumanoidRootPart")) then
+        tPlayer = Players:FindFirstChild(givenName)
+        if (tPlayer.Character) and (tPlayer.Character:FindFirstChild("HumanoidRootPart")) then
+            p.Character.HumanoidRootPart.CFrame = tPlayer.Character.HumanoidRootPart.CFrame * CFrame.new(0,5,0)
+        end
+    else
+        for i, plyrs in pairs(Players:GetPlayers()) do
+            if (plyrs.DisplayName == givenName) then
+                tPlayer = plyrs
+                if (tPlayer.Character) and (tPlayer.Character:FindFirstChild("HumanoidRootPart")) then
+                    if (p.Character) and (p.Character:FindFirstChild("HumanoidRootPart")) then
+                        p.Character.HumanoidRootPart.CFrame = tPlayer.Character.HumanoidRootPart.CFrame * CFrame.new(0,5,0)
+                    end
+                end
+            end
+        end
+    end
+end
 
 local function CreateButton(name, parent)
     local barFrame = Instance.new("CanvasGroup", parent)
@@ -117,6 +148,12 @@ local function InitUI()
     teleportBox.PlaceholderText = "Username..."
     teleportBox.TextColor3 = Color3.fromRGB(255,255,255)
     teleportBox.TextScaled = true
+    teleportBox.FocusLost:Connect(function(enter)
+        if (enter) then
+            TeleportPlayer(teleportBox.Text)
+            teleportBox.Text = ""
+        end
+    end)
 
     local teleportBoxCorner = Instance.new("UICorner", teleportBox)
 
